@@ -9,23 +9,29 @@ X-Layer. The strategy supplies stablecoin collateral, borrows against
 it, and deploys the borrowed capital into a concentrated LP position
 to earn trading fees that exceed the borrow cost.
 
-> **Built with two Almanak products:**
+> **Built with three Almanak products:**
 >
-> - **[Almanak SDK](https://github.com/almanak-co/sdk)** (open-source) —
->   a production DeFi strategy framework for quants. Intent-based
+> - **[Almanak Edge](https://app.almanak.co/edge/signals)** (freemium)
+>   — DeFi alpha signal finder. Edge pulls on-chain activity via the
+>   **OKX Onchain OS API** to surface high-conviction opportunities
+>   across chains (including X-Layer). The original idea for this
+>   strategy came from an Edge signal (`cmnt8k6v2005saopppn2hx9bx`)
+>   that flagged the Aave + Uniswap V3 edge on X-Layer.
+>
+> - **[Almanak Code](https://app.almanak.co/chat)** (freemium) — AI
+>   coding agent that turns Edge signals into runnable strategy code.
+>   The full `IntentStrategy` implementation in this repo (state
+>   machine, adaptive rebalance engine, backtesting harness, teardown
+>   logic) was written by Almanak Code, working directly against the
+>   Almanak SDK.
+>
+> - **[Almanak SDK](https://github.com/almanak-co/sdk)** (open-source)
+>   — production DeFi strategy framework for quants. Intent-based
 >   vocabulary, multi-chain / multi-protocol connectors, gateway-mediated
 >   execution, and built-in backtesting. The SDK **recently added
 >   X-Layer support**, including the Aave V3.6 and Uniswap V3 connectors
 >   used here. This strategy is a live example of what a single
 >   `IntentStrategy` class can do across those two protocols on X-Layer.
->
-> - **[Almanak Edge](https://app.almanak.co/edge/signals)** (not
->   open-source, freemium) — Almanak's DeFi alpha signal finder. Edge
->   pulls on-chain activity via the **OKX Onchain OS API** to surface
->   high-conviction opportunities across chains (including X-Layer).
->   The original idea for this strategy came from an Edge signal
->   (`cmnt8k6v2005saopppn2hx9bx`) that flagged the Aave + Uniswap V3
->   edge on X-Layer.
 
 ## Why this strategy
 
@@ -73,18 +79,28 @@ agentic strategies, and the Edge signal finder.
 
 ## Architecture overview
 
+**End-to-end Almanak pipeline** — from signal discovery to live on-chain execution:
+
 ```
                          ┌─────────────────────────────┐
-                         │  Edge signal                │
-                         │  cmnt8k6v2005saopppn2hx9bx  │
-                         │  (sourced via OKX Onchain   │
-                         │   OS API on X-Layer)        │
+                         │  Almanak EDGE               │
+                         │  - OKX Onchain OS API       │
+                         │  - signal scoring / dedup   │
+                         │  - signal cmnt8k6v2005s...  │
                          └──────────────┬──────────────┘
-                                        │ thesis / params
+                                        │ Strategy Spec
                                         ▼
                          ┌─────────────────────────────┐
+                         │  Almanak CODE (AI agent)    │
+                         │  - reads spec + codebase    │
+                         │  - writes IntentStrategy    │
+                         │  - generates backtest       │
+                         └──────────────┬──────────────┘
+                                        │ Python strategy code
+                                        ▼
+                         ┌─────────────────────────────┐
+                         │  Almanak SDK                │
                          │  IntentStrategy class       │
-                         │  (Almanak SDK)              │
                          │                             │
                          │  decide(market) -> Intent   │
                          └──────────────┬──────────────┘
@@ -112,6 +128,9 @@ agentic strategies, and the Edge signal finder.
                      │ on X-Layer   │   │ on X-Layer   │
                      └──────────────┘   └──────────────┘
 ```
+
+The full loop — **Edge discovers → Code implements → SDK executes** —
+ran end-to-end on X-Layer mainnet during this hackathon.
 
 **State machine (entry → monitor → teardown):**
 
