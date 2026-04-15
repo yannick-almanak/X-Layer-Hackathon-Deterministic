@@ -9,6 +9,37 @@ X-Layer. The strategy supplies stablecoin collateral, borrows against
 it, and deploys the borrowed capital into a concentrated LP position
 to earn trading fees that exceed the borrow cost.
 
+## Why this strategy
+
+This strategy **showcases what the Almanak SDK can do on X-Layer**:
+multi-protocol composition (Aave V3.6 + Uniswap V3), adaptive
+vol-based rebalancing, full entry→monitor→teardown lifecycle, and
+real on-chain execution driven by a single `IntentStrategy` class. It
+demonstrates how quickly a quant can wire up a production DeFi loop
+using the SDK's intent vocabulary, connector framework, and gateway
+execution pipeline — all on a fresh chain (X-Layer / OKB L2).
+
+**Honest take on current X-Layer economics (April 2026):** right now
+the Aave V3.6 supply/borrow leg is a net drag — borrow rates exceed
+supply yield by a comfortable margin on the reserves we use, so
+economically it would be *better today* to skip the lending leg
+entirely and just run a straight Uniswap V3 WOKB/USDT LP. We kept the
+full carry loop in because:
+
+1. It exercises the SDK's full multi-protocol surface (the actual
+   *point* of the hackathon submission — show what the stack can do).
+2. As X-Layer matures and lending pools deepen, supply rates will
+   catch up and the carry will turn positive — at which point the
+   strategy is already built and parameterized.
+3. The adaptive-range LP component is the dominant profit center
+   regardless of the lending leg; the loop just adds modest extra
+   leverage when the spread is favorable.
+
+In other words: this is an **infrastructure showcase first, yield
+optimizer second**. When X-Layer Aave rates normalize, the same
+strategy will make a small extra gain on the carry spread on top of
+LP fees.
+
 ---
 
 ## Strategy: `aave_okb_clmm_loop`
