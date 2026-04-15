@@ -593,6 +593,5 @@ uv run python strategies/xlayer/xlayer_deterministic/aave_okb_clmm_loop/backtest
 
 ## Related
 
-- **Agentic sibling project**: `strategies/xlayer/xlayer_agentic/`
 - **Strategy technical docs**: `aave_okb_clmm_loop/README.md`
 - **Edge spec**: Almanak Edge signal ID `cmnt8k6v2005saopppn2hx9bx`
