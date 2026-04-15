@@ -178,14 +178,9 @@ ran end-to-end on X-Layer mainnet during this hackathon.
 └─────────────────────────┘      └──────────────────────────────────┘
 ```
 
-**Verified on mainnet (April 11-13, 2026):**
-- Entry: 8 intents, all SUCCESS (see `aave_okb_clmm_loop/README.md`)
-- Steady state: 88 hours of live operation, 0 rebalances needed
-- Teardown: 9 intents, all SUCCESS — **final state: $0 collateral, $0 debt, LP NFT burned**
-
-See [`aave_okb_clmm_loop/README.md`](aave_okb_clmm_loop/README.md) for
-the full 843-line technical documentation including deeper architecture,
-economics, backtesting results, risk analysis, and IL mechanics.
+(Mainnet verification of every pipeline is covered later under
+**[Smoke test](#smoke-test--4-capital-april-11-13-2026)** and
+**[Real deployment](#real-deployment--200-capital-april-13--present)**.)
 
 ---
 
@@ -276,16 +271,28 @@ code changes — just parameter re-tuning via config.json.
 
 ## Proven on mainnet (full lifecycle: entry -> earn -> teardown)
 
-This strategy was deployed on xlayer mainnet from April 11-13, 2026.
-After 88 hours of live operation earning 17% APR in LP fees, it was
-torn down via the built-in teardown mechanism to demonstrate the full
-lifecycle.
+The strategy was validated in **two distinct phases** on X-Layer mainnet:
 
-**Wallet** (all txs verifiable on OKLink X-Layer explorer):
-[`0x54776446Aa29Fc49d152B4850bD410eA1E4d24bF`](https://www.oklink.com/x-layer/address/0x54776446Aa29Fc49d152B4850bD410eA1E4d24bF)
+- **Smoke test** — $4 capital, full entry → 88h live → teardown
+  (April 11-13, 2026). Small enough to cap downside while exercising
+  every state transition (entry pipeline, rebalance engine, teardown
+  pipeline). **Wallet**:
+  [`0x54776446Aa29Fc49d152B4850bD410eA1E4d24bF`](https://www.oklink.com/x-layer/address/0x54776446Aa29Fc49d152B4850bD410eA1E4d24bF)
 
-**Current redeployment wallet** ($200 live position):
-[`0xc48E245cc551bd6853EeB1c3068C10eA8856D6ad`](https://www.oklink.com/x-layer/address/0xc48e245cc551bd6853eeb1c3068c10ea8856d6ad)
+- **Real deployment** — $200 capital, entered April 13, currently live.
+  This is the deployment the judges will see running during review.
+  **Wallet**:
+  [`0xc48E245cc551bd6853EeB1c3068C10eA8856D6ad`](https://www.oklink.com/x-layer/address/0xc48e245cc551bd6853eeb1c3068c10ea8856d6ad)
+
+---
+
+## Smoke test — $4 capital (April 11-13, 2026)
+
+Deployed on xlayer mainnet with $4 USDT0 capital to validate every
+pipeline end-to-end before committing real size. After 88 hours of
+live operation earning 17% APR in LP fees, the strategy was torn
+down via the built-in teardown mechanism to prove the full lifecycle
+works on-chain. **All transactions verifiable on OKLink.**
 
 ### Entry (April 11, 2026) -- 8 on-chain transactions
 
@@ -381,14 +388,14 @@ The strategy is profitable at any capital level -- it just needs
 enough time for fee accumulation to exceed the fixed entry+exit cost.
 At $200 (the planned redeployment), breakeven is ~9 hours.
 
-### Redeployment plan
+## Real deployment — $200 capital (April 13 → present)
 
-The strategy was redeployed on a **dedicated isolated wallet** with
-**$200 USD** of capital ($200 USDT0 supply -> $100 USDG borrow -> LP).
+After the smoke test validated every pipeline end-to-end, the strategy
+was redeployed on a **dedicated isolated wallet** with **$200 USD**
+of capital ($200 USDT0 supply -> $100 USDG borrow -> $100 LP).
+This is the live deployment available for judges to verify on-chain.
 
-### Live $200 deployment — printing
-
-Dashboard snapshot (April 15, 2026):
+### Dashboard snapshot (April 15, 2026) — printing
 
 ```
 ┌───────────────────────────────────────┐
