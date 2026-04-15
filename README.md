@@ -129,20 +129,59 @@ LP fees.
 The full loop — **Edge discovers → Code implements → SDK executes** —
 ran end-to-end on X-Layer mainnet during this hackathon.
 
-**State machine (entry → monitor → teardown):**
+**State machine (entry → monitor → rebalance → teardown):**
 
 ```
-idle
-  → supplying → supplied
-              → borrowing → borrowed
-                          → converting → converted
-                                       → splitting → split_done
-                                                   → opening_lp → running
-
-running (steady state)
-  → vol-adaptive range monitor (10-cycle confirmation, 1h cooldown)
-  → closing_lp → lp_closed → (rebalance) or (teardown)
+┌── ENTRY PIPELINE ────────────────────────────────────────────────┐
+│                                                                  │
+│  idle                                                            │
+│    → supplying → supplied           [Aave SUPPLY USDT0]          │
+│                → borrowing → borrowed      [Aave BORROW USDG]    │
+│                            → converting → converted [USDG→USDT]  │
+│                                        → splitting → split_done  │
+│                                          [½ USDT → WOKB]         │
+│                                        → opening_lp → running    │
+│                                          [Uniswap V3 MINT]       │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌── STEADY STATE (running) ────────────────────────────────────────┐
+│                                                                  │
+│  Every cycle (30s):                                              │
+│   - read price, realized vol, in-range / out-of-range            │
+│   - recompute adaptive range width = vol_mult × σ_daily          │
+│   - 10-cycle confirmation window (no rebalance-to-death)         │
+│   - 1-hour cooldown gate                                         │
+│   - HOLD  ──or──>  trigger rebalance                             │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
+          │                                      │
+          │ (out-of-range, confirmed)            │ (force_teardown=true)
+          ▼                                      ▼
+┌── REBALANCE LOOP ───────┐      ┌── TEARDOWN PIPELINE ─────────────┐
+│                         │      │                                  │
+│ running                 │      │ running                          │
+│  → closing_lp           │      │  → closing_lp                    │
+│     [Uniswap DECREASE   │      │     [Uniswap DECREASE + COLLECT] │
+│      + COLLECT fees]    │      │  → lp_closed                     │
+│  → lp_closed            │      │  → swap_to_debt                  │
+│  → splitting            │      │     [WOKB → USDT → USDG]         │
+│     [rebalance both     │      │  → swapped                       │
+│      legs to new range] │      │  → repay_debt                    │
+│  → split_done           │      │     [Aave REPAY full USDG debt]  │
+│  → opening_lp           │      │  → repaid                        │
+│     [MINT new position  │      │  → withdraw_collateral           │
+│      centered on price] │      │     [Aave WITHDRAW all USDT0]    │
+│  → running              │      │  → terminated                    │
+│                         │      │                                  │
+└─────────────────────────┘      └──────────────────────────────────┘
 ```
+
+**Verified on mainnet (April 11-13, 2026):**
+- Entry: 8 intents, all SUCCESS (see `aave_okb_clmm_loop/README.md`)
+- Steady state: 88 hours of live operation, 0 rebalances needed
+- Teardown: 9 intents, all SUCCESS — **final state: $0 collateral, $0 debt, LP NFT burned**
 
 See [`aave_okb_clmm_loop/README.md`](aave_okb_clmm_loop/README.md) for
 the full 843-line technical documentation including deeper architecture,
