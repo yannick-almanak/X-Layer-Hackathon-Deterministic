@@ -19,12 +19,13 @@ to earn trading fees that exceed the borrow cost.
 >   used here. This strategy is a live example of what a single
 >   `IntentStrategy` class can do across those two protocols on X-Layer.
 >
-> - **Almanak Edge** (not open-source, freemium) — Almanak's DeFi alpha
->   signal finder. Edge pulls on-chain activity via the **OKX Onchain OS
->   API** to surface high-conviction opportunities across chains
->   (including X-Layer). The original idea for this strategy came from
->   an Edge signal (`cmnt8k6v2005saopppn2hx9bx`) that flagged the
->   Aave + Uniswap V3 edge on X-Layer.
+> - **[Almanak Edge](https://app.almanak.co/edge/signals)** (not
+>   open-source, freemium) — Almanak's DeFi alpha signal finder. Edge
+>   pulls on-chain activity via the **OKX Onchain OS API** to surface
+>   high-conviction opportunities across chains (including X-Layer).
+>   The original idea for this strategy came from an Edge signal
+>   (`cmnt8k6v2005saopppn2hx9bx`) that flagged the Aave + Uniswap V3
+>   edge on X-Layer.
 
 ## Why this strategy
 
@@ -157,11 +158,12 @@ This strategy exercises two OKX ecosystem "skills":
 
 ### 1. OKX Onchain OS API — signal intake (indirect, via Almanak Edge)
 
-The idea for this strategy came from **Almanak Edge**, which uses the
-**OKX Onchain OS API** to pull on-chain activity data from X-Layer
-and score opportunities. Edge signal `cmnt8k6v2005saopppn2hx9bx`
-flagged the combined Aave V3.6 + Uniswap V3 edge on X-Layer and that
-signal became the thesis for this submission.
+The idea for this strategy came from
+**[Almanak Edge](https://app.almanak.co/edge/signals)**, which uses the
+**OKX Onchain OS API** to pull on-chain activity data from X-Layer and
+score opportunities. Edge signal `cmnt8k6v2005saopppn2hx9bx` flagged
+the combined Aave V3.6 + Uniswap V3 edge on X-Layer and that signal
+became the thesis for this submission.
 
 ### 2. Uniswap V3 on X-Layer — execution skill (direct)
 
