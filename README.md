@@ -470,6 +470,12 @@ Over the 90-day backtest window, OKB price spent **three distinct
 periods in a tight trading channel** (low realized vol, narrow price
 range). These were the periods where the adaptive engine shined:
 
+![90-day OKB backtest showing 3 narrow-band regimes](img/OKB-NarrowBands-Backtest.png)
+
+*90-day OKB price chart with the three "tight regime" clusters
+highlighted — periods where realized vol compressed and the adaptive
+engine held tight LP ranges to maximize fee density.*
+
 - **Cluster 1 (mid-Jan → early-Feb)**: ~18 days at σ ≈ 1.5%/day,
   engine sized to ±5% range → very high fee density, 0 rebalances
 - **Cluster 2 (mid-Feb → early-Mar)**: ~12 days at σ ≈ 1.2%/day,
