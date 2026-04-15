@@ -9,6 +9,23 @@ X-Layer. The strategy supplies stablecoin collateral, borrows against
 it, and deploys the borrowed capital into a concentrated LP position
 to earn trading fees that exceed the borrow cost.
 
+> **Built with two Almanak products:**
+>
+> - **[Almanak SDK](https://github.com/almanak-co/sdk)** (open-source) —
+>   a production DeFi strategy framework for quants. Intent-based
+>   vocabulary, multi-chain / multi-protocol connectors, gateway-mediated
+>   execution, and built-in backtesting. The SDK **recently added
+>   X-Layer support**, including the Aave V3.6 and Uniswap V3 connectors
+>   used here. This strategy is a live example of what a single
+>   `IntentStrategy` class can do across those two protocols on X-Layer.
+>
+> - **Almanak Edge** (not open-source, freemium) — Almanak's DeFi alpha
+>   signal finder. Edge pulls on-chain activity via the **OKX Onchain OS
+>   API** to surface high-conviction opportunities across chains
+>   (including X-Layer). The original idea for this strategy came from
+>   an Edge signal (`cmnt8k6v2005saopppn2hx9bx`) that flagged the
+>   Aave + Uniswap V3 edge on X-Layer.
+
 ## Why this strategy
 
 This strategy **showcases what the Almanak SDK can do on X-Layer**:
