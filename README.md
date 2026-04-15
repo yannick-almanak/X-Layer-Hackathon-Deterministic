@@ -537,9 +537,6 @@ adaptive comparison table, scaling considerations, and IL caveats.
 |--------|---------|----------|
 | **aave_okb_clmm_loop** | `0xc48E245cc551bd6853EeB1c3068C10eA8856D6ad` | [OKLink](https://www.oklink.com/x-layer/address/0xc48e245cc551bd6853eeb1c3068c10ea8856d6ad) |
 
-The wallet has its own `.env` with an isolated private key derived
-deterministically from the master key.
-
 **Funding needed**: ~0.01 OKB (gas, ~$0.85) + 200 USDT0 (strategy capital)
 
 ---
