@@ -233,7 +233,8 @@ proposal #67). The strategy uses:
 
 Pool used: **WOKB/USDT 0.30% fee tier** (the deepest on X-Layer at
 hackathon time). All LP positions are NFTs held by the strategy wallet
-and verifiable on [OKX X-Layer Explorer](https://www.okx.com/web3/explorer/xlayer).
+and verifiable on OKLink's X-Layer explorer:
+[oklink.com/x-layer/address/0xc48e245cc551bd6853eeb1c3068c10ea8856d6ad](https://www.oklink.com/x-layer/address/0xc48e245cc551bd6853eeb1c3068c10ea8856d6ad).
 
 ---
 
@@ -278,10 +279,13 @@ code changes — just parameter re-tuning via config.json.
 This strategy was deployed on xlayer mainnet from April 11-13, 2026.
 After 88 hours of live operation earning 17% APR in LP fees, it was
 torn down via the built-in teardown mechanism to demonstrate the full
-lifecycle. **Every transaction below is verifiable on the
-[OKX X-Layer Explorer](https://www.okx.com/web3/explorer/xlayer).**
+lifecycle.
 
-Wallet: `0x54776446Aa29Fc49d152B4850bD410eA1E4d24bF`
+**Wallet** (all txs verifiable on OKLink X-Layer explorer):
+[`0x54776446Aa29Fc49d152B4850bD410eA1E4d24bF`](https://www.oklink.com/x-layer/address/0x54776446Aa29Fc49d152B4850bD410eA1E4d24bF)
+
+**Current redeployment wallet** ($200 live position):
+[`0xc48E245cc551bd6853EeB1c3068C10eA8856D6ad`](https://www.oklink.com/x-layer/address/0xc48e245cc551bd6853eeb1c3068c10ea8856d6ad)
 
 ### Entry (April 11, 2026) -- 8 on-chain transactions
 
@@ -392,9 +396,9 @@ At $200:
 
 ## Wallet
 
-| Wallet | Address |
-|--------|---------|
-| **aave_okb_clmm_loop** | `0xc48E245cc551bd6853EeB1c3068C10eA8856D6ad` |
+| Wallet | Address | Explorer |
+|--------|---------|----------|
+| **aave_okb_clmm_loop** | `0xc48E245cc551bd6853EeB1c3068C10eA8856D6ad` | [OKLink](https://www.oklink.com/x-layer/address/0xc48e245cc551bd6853eeb1c3068c10ea8856d6ad) |
 
 The wallet has its own `.env` with an isolated private key derived
 deterministically from the master key.
