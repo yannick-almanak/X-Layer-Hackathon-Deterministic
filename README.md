@@ -59,13 +59,81 @@ LP fees.
 
 ---
 
-## Strategy: `aave_okb_clmm_loop`
+## Team
 
-See `aave_okb_clmm_loop/README.md` for the full 790-line technical
-documentation including architecture, economics, backtesting results,
-risk analysis, and IL mechanics.
+| | |
+|---|---|
+| **0xAgentKitchen** | Head of AI at Almanak |
 
-**Quick summary:**
+Building autonomous DeFi infrastructure at Almanak — open-source SDK,
+agentic strategies, and the Edge signal finder.
+
+---
+
+## Architecture overview
+
+```
+                         ┌─────────────────────────────┐
+                         │  Edge signal                │
+                         │  cmnt8k6v2005saopppn2hx9bx  │
+                         │  (sourced via OKX Onchain   │
+                         │   OS API on X-Layer)        │
+                         └──────────────┬──────────────┘
+                                        │ thesis / params
+                                        ▼
+                         ┌─────────────────────────────┐
+                         │  IntentStrategy class       │
+                         │  (Almanak SDK)              │
+                         │                             │
+                         │  decide(market) -> Intent   │
+                         └──────────────┬──────────────┘
+                                        │ intents
+                                        ▼
+                         ┌─────────────────────────────┐
+                         │  Intent compiler (SDK)      │
+                         │  - resolves tokens          │
+                         │  - plans routing            │
+                         │  - builds ActionBundle      │
+                         └──────────────┬──────────────┘
+                                        │ ActionBundle
+                                        ▼
+                         ┌─────────────────────────────┐
+                         │  Gateway (gRPC sidecar)     │
+                         │  - price aggregator         │
+                         │  - balance provider         │
+                         │  - ExecutionOrchestrator    │
+                         │  - signer + simulator       │
+                         └───────┬──────────┬──────────┘
+                                 │          │
+                                 ▼          ▼
+                     ┌──────────────┐   ┌──────────────┐
+                     │ Aave V3.6    │   │ Uniswap V3   │
+                     │ on X-Layer   │   │ on X-Layer   │
+                     └──────────────┘   └──────────────┘
+```
+
+**State machine (entry → monitor → teardown):**
+
+```
+idle
+  → supplying → supplied
+              → borrowing → borrowed
+                          → converting → converted
+                                       → splitting → split_done
+                                                   → opening_lp → running
+
+running (steady state)
+  → vol-adaptive range monitor (10-cycle confirmation, 1h cooldown)
+  → closing_lp → lp_closed → (rebalance) or (teardown)
+```
+
+See [`aave_okb_clmm_loop/README.md`](aave_okb_clmm_loop/README.md) for
+the full 843-line technical documentation including deeper architecture,
+economics, backtesting results, risk analysis, and IL mechanics.
+
+---
+
+## Working mechanics
 
 ```
 Supply USDT0 to Aave V3.6
@@ -75,6 +143,76 @@ Supply USDT0 to Aave V3.6
   -> Open Uniswap V3 WOKB/USDT/3000 concentrated LP
   -> Monitor + auto-rebalance with vol-adaptive range
 ```
+
+**Adaptive rebalance logic** (the key IP):
+
+- `range_width_pct = vol_multiplier × realized_daily_vol` (recomputed every cycle)
+- Rebalance triggered only after `confirmation_cycles=10` consecutive out-of-range observations
+- `rebalance_cooldown_s=3600` prevents rapid-fire rebalances on noise
+- Backtest: 63 parameter configs × 90 days — best net APR: **+106%**
+
+## Onchain OS / Uniswap skill usage
+
+This strategy exercises two OKX ecosystem "skills":
+
+### 1. OKX Onchain OS API — signal intake (indirect, via Almanak Edge)
+
+The idea for this strategy came from **Almanak Edge**, which uses the
+**OKX Onchain OS API** to pull on-chain activity data from X-Layer
+and score opportunities. Edge signal `cmnt8k6v2005saopppn2hx9bx`
+flagged the combined Aave V3.6 + Uniswap V3 edge on X-Layer and that
+signal became the thesis for this submission.
+
+### 2. Uniswap V3 on X-Layer — execution skill (direct)
+
+All LP operations run through the **Uniswap V3** deployment on X-Layer,
+accessed via the Almanak SDK's `uniswap_v3` connector (governance
+proposal #67). The strategy uses:
+
+- **`NonfungiblePositionManager.mint()`** — open concentrated LP
+- **`SwapRouter.exactInputSingle()`** — rebalance + entry/exit swaps
+- **`collect()`** (staticcall) — read accrued fees without claiming
+- **`decreaseLiquidity()` + `collect()`** — close LP for rebalance/teardown
+
+Pool used: **WOKB/USDT 0.30% fee tier** (the deepest on X-Layer at
+hackathon time). All LP positions are NFTs held by the strategy wallet
+and verifiable on [OKX X-Layer Explorer](https://www.okx.com/web3/explorer/xlayer).
+
+---
+
+## X-Layer ecosystem positioning
+
+X-Layer is a fresh OKB L2 with rapidly-maturing DeFi infrastructure.
+This strategy sits at the intersection of the two deepest protocols
+on the chain today:
+
+- **Aave V3.6** (governance proposal #460) — the primary lending
+  market, with USDT0 / xETH / xBTC as collateral-eligible reserves
+- **Uniswap V3** (governance proposal #67) — the primary AMM, with
+  the WOKB/USDT pair carrying the bulk of on-chain volume
+
+**What this submission adds to the X-Layer ecosystem:**
+
+1. **A working multi-protocol reference strategy** — any quant can
+   fork this and swap in different collateral / LP pairs as liquidity
+   deepens on X-Layer.
+2. **Full SDK X-Layer support in the public Almanak SDK** — the
+   Aave V3.6 and Uniswap V3 connectors used here are merged upstream
+   and available to any SDK user targeting X-Layer.
+3. **Tooling for X-Layer quants** — the SDK now ships with X-Layer
+   chain config, token registry entries (USDT0, USDG, WOKB), gas
+   estimation, and execution primitives.
+4. **A signal-to-strategy example** — end-to-end demonstration of
+   how an Edge signal (via OKX Onchain OS API) becomes a deployed,
+   monitored, production on-chain position.
+
+As X-Layer lending markets deepen and rates normalize, the same
+strategy will capture extra spread on top of LP fees without any
+code changes — just parameter re-tuning via config.json.
+
+---
+
+## Strategy: `aave_okb_clmm_loop`
 
 ---
 
