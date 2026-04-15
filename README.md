@@ -72,9 +72,6 @@ LP fees.
 |---|---|
 | **0xAgentKitchen** | Head of AI at Almanak |
 
-Building autonomous DeFi infrastructure at Almanak — open-source SDK,
-agentic strategies, and the Edge signal finder.
-
 ---
 
 ## Architecture overview
